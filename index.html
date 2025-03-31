@@ -101,6 +101,49 @@
       margin-top: 20px;
       background-color: #f0f0f0;
     }
+    .pie-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+      height: 300px;
+    }
+    .pie-chart {
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      background: conic-gradient(
+        #ff6666 0% 25%,
+        #ffaa66 25% 60%,
+        #66aa66 60% 85%,
+        #66cc66 85% 100%
+      );
+      position: relative;
+    }
+    .pie-legend {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin-left: 30px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .legend-color {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+    }
+    .reset-btn {
+      background-color: #ff6666;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      margin-top: 20px;
+      cursor: pointer;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -211,6 +254,30 @@
         </div>
       </div>
       
+      <!-- 円グラフ表示 -->
+      <h2>定数管理の負担感（円グラフ）</h2>
+      <div class="pie-container">
+        <div class="pie-chart" id="burden-pie-chart"></div>
+        <div class="pie-legend">
+          <div class="legend-item">
+            <div class="legend-color" style="background-color: #ff6666;"></div>
+            <div class="legend-text">感じる: <span id="burden-percent-0">31%</span></div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background-color: #ffaa66;"></div>
+            <div class="legend-text">まあまあ感じる: <span id="burden-percent-1">41%</span></div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background-color: #66aa66;"></div>
+            <div class="legend-text">あまり感じない: <span id="burden-percent-2">17%</span></div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background-color: #66cc66;"></div>
+            <div class="legend-text">感じない: <span id="burden-percent-3">9%</span></div>
+          </div>
+        </div>
+      </div>
+      
       <h2>救急カート管理の課題</h2>
       <div class="chart">
         <div class="bar-container" id="issues-chart">
@@ -241,6 +308,7 @@
         </div>
       </div>
       
+      <button class="reset-btn" onclick="resetResults()">すべての回答をリセット</button>
       <button class="back-btn" onclick="showSurvey()">アンケートに戻る</button>
     </div>
   </div>
@@ -279,6 +347,9 @@
       updateChart('frequency-chart', answers.q1);
       updateChart('burden-chart', answers.q2);
       updateChart('issues-chart', answers.q3);
+      
+      // 円グラフも更新
+      updatePieChart();
       
       // 結果画面を表示
       document.getElementById('survey').style.display = 'none';
@@ -322,6 +393,69 @@
       Object.keys(answers).forEach(key => {
         answers[key] = null;
       });
+    }
+    
+    // 円グラフを更新する関数
+    function updatePieChart() {
+      const counts = document.querySelectorAll('#burden-chart .count');
+      let total = 0;
+      const values = [];
+      
+      // 合計を計算
+      counts.forEach(count => {
+        const value = parseInt(count.textContent);
+        total += value;
+        values.push(value);
+      });
+      
+      // パーセンテージを計算
+      let percentages = [];
+      let cumulativePercent = 0;
+      
+      values.forEach((value, index) => {
+        const percent = total > 0 ? Math.round((value / total) * 100) : 0;
+        document.getElementById(`burden-percent-${index}`).textContent = `${percent}%`;
+        percentages.push(percent);
+        
+        if (index > 0) {
+          cumulativePercent += percentages[index - 1];
+        }
+      });
+      
+      // conic-gradientを更新
+      const pieChart = document.getElementById('burden-pie-chart');
+      let gradient = 'conic-gradient(';
+      
+      percentages.forEach((percent, index) => {
+        const colors = ['#ff6666', '#ffaa66', '#66aa66', '#66cc66'];
+        const startPercent = index === 0 ? 0 : percentages.slice(0, index).reduce((a, b) => a + b, 0);
+        const endPercent = startPercent + percent;
+        
+        gradient += `${colors[index]} ${startPercent}% ${endPercent}%`;
+        if (index < percentages.length - 1) gradient += ', ';
+      });
+      
+      gradient += ')';
+      pieChart.style.background = gradient;
+    }
+
+    // 全ての結果をリセットする関数
+    function resetResults() {
+      if (confirm('すべての集計データをリセットしますか？この操作は元に戻せません。')) {
+        const counts = document.querySelectorAll('.count');
+        counts.forEach(count => {
+          count.textContent = '0';
+        });
+        
+        // すべてのバーの高さをリセット
+        const bars = document.querySelectorAll('.bar');
+        bars.forEach(bar => {
+          bar.style.height = '0%';
+        });
+        
+        // 円グラフも更新
+        updatePieChart();
+      }
     }
   </script>
 </body>
