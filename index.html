@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>救急カート管理アンケート</title>
+  <style>
+    body {
+      font-family: 'Helvetica', 'Arial', sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f0f8ff;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #0066cc;
+      text-align: center;
+    }
+    .question {
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    button {
+      padding: 12px;
+      border: none;
+      background-color: #f0f0f0;
+      border-radius: 5px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #e3e3e3;
+    }
+    button.selected {
+      background-color: #0066cc;
+      color: white;
+    }
+    .submit-btn {
+      background-color: #4CAF50;
+      color: white;
+      padding: 15px;
+      font-size: 18px;
+      text-align: center;
+    }
+    .submit-btn:hover {
+      background-color: #45a049;
+    }
+    .results {
+      display: none;
+    }
+    .chart {
+      margin-top: 20px;
+      height: 300px;
+      position: relative;
+    }
+    .bar-container {
+      display: flex;
+      height: 250px;
+      align-items: flex-end;
+      gap: 20px;
+      padding-top: 20px;
+    }
+    .bar-group {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      height: 100%;
+      align-items: center;
+    }
+    .bar {
+      width: 50px;
+      background-color: #0066cc;
+      transition: height 0.5s;
+      position: relative;
+    }
+    .bar-label {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 14px;
+    }
+    .count {
+      position: absolute;
+      top: -25px;
+      width: 100%;
+      text-align: center;
+    }
+    .back-btn {
+      margin-top: 20px;
+      background-color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="survey">
+      <h1>救急カート管理アンケート</h1>
+      
+      <div class="question">
+        <h2>1. どのくらいの頻度で救急カートの定数管理をしていますか？</h2>
+        <div class="options" id="q1-options">
+          <button onclick="selectOption('q1', 0)">勤務帯毎</button>
+          <button onclick="selectOption('q1', 1)">1日1回</button>
+          <button onclick="selectOption('q1', 2)">週に1回</button>
+          <button onclick="selectOption('q1', 3)">使用後</button>
+          <button onclick="selectOption('q1', 4)">その他</button>
+        </div>
+      </div>
+      
+      <div class="question">
+        <h2>2. 救急カートの定数管理に負担を感じますか？</h2>
+        <div class="options" id="q2-options">
+          <button onclick="selectOption('q2', 0)">感じる</button>
+          <button onclick="selectOption('q2', 1)">まあまあ感じる</button>
+          <button onclick="selectOption('q2', 2)">あまり感じない</button>
+          <button onclick="selectOption('q2', 3)">感じない</button>
+        </div>
+      </div>
+      
+      <div class="question">
+        <h2>3. 救急カート管理で最も困っていることは何ですか？</h2>
+        <div class="options" id="q3-options">
+          <button onclick="selectOption('q3', 0)">使用実績を追えない</button>
+          <button onclick="selectOption('q3', 1)">在庫管理が困難</button>
+          <button onclick="selectOption('q3', 2)">期限切れの管理</button>
+          <button onclick="selectOption('q3', 3)">使用後の補充忘れ</button>
+        </div>
+      </div>
+      
+      <button class="submit-btn" onclick="submitSurvey()">送信する</button>
+    </div>
+    
+    <div id="results" class="results">
+      <h1>アンケート結果</h1>
+      
+      <h2>定数管理の頻度</h2>
+      <div class="chart">
+        <div class="bar-container" id="frequency-chart">
+          <div class="bar-group">
+            <div class="bar" style="height: 60%;">
+              <div class="count">15</div>
+            </div>
+            <div class="bar-label">勤務帯毎</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 80%;">
+              <div class="count">20</div>
+            </div>
+            <div class="bar-label">1日1回</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 40%;">
+              <div class="count">10</div>
+            </div>
+            <div class="bar-label">週に1回</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 20%;">
+              <div class="count">5</div>
+            </div>
+            <div class="bar-label">使用後</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 12%;">
+              <div class="count">3</div>
+            </div>
+            <div class="bar-label">その他</div>
+          </div>
+        </div>
+      </div>
+      
+      <h2>定数管理の負担感</h2>
+      <div class="chart">
+        <div class="bar-container" id="burden-chart">
+          <div class="bar-group">
+            <div class="bar" style="height: 68%; background-color: #ff6666;">
+              <div class="count">17</div>
+            </div>
+            <div class="bar-label">感じる</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 88%; background-color: #ffaa66;">
+              <div class="count">22</div>
+            </div>
+            <div class="bar-label">まあまあ感じる</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 36%; background-color: #66aa66;">
+              <div class="count">9</div>
+            </div>
+            <div class="bar-label">あまり感じない</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 20%; background-color: #66cc66;">
+              <div class="count">5</div>
+            </div>
+            <div class="bar-label">感じない</div>
+          </div>
+        </div>
+      </div>
+      
+      <h2>救急カート管理の課題</h2>
+      <div class="chart">
+        <div class="bar-container" id="issues-chart">
+          <div class="bar-group">
+            <div class="bar" style="height: 72%; background-color: #6666cc;">
+              <div class="count">18</div>
+            </div>
+            <div class="bar-label">使用実績を追えない</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 64%; background-color: #6699cc;">
+              <div class="count">16</div>
+            </div>
+            <div class="bar-label">在庫管理が困難</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 56%; background-color: #66cccc;">
+              <div class="count">14</div>
+            </div>
+            <div class="bar-label">期限切れの管理</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 48%; background-color: #66ccaa;">
+              <div class="count">12</div>
+            </div>
+            <div class="bar-label">使用後の補充忘れ</div>
+          </div>
+        </div>
+      </div>
+      
+      <button class="back-btn" onclick="showSurvey()">アンケートに戻る</button>
+    </div>
+  </div>
+
+  <script>
+    // 選択された回答を記録する
+    const answers = {
+      q1: null,
+      q2: null,
+      q3: null
+    };
+    
+    // 回答を選択する関数
+    function selectOption(question, index) {
+      // 以前の選択を解除
+      const buttons = document.querySelectorAll(`#${question}-options button`);
+      buttons.forEach(btn => btn.classList.remove('selected'));
+      
+      // 新しい選択を記録
+      buttons[index].classList.add('selected');
+      answers[question] = index;
+    }
+    
+    // アンケートを送信する関数
+    function submitSurvey() {
+      // すべての質問に回答しているか確認
+      if (answers.q1 === null || answers.q2 === null || answers.q3 === null) {
+        alert('すべての質問に回答してください');
+        return;
+      }
+      
+      // 実際のアプリケーションでは、ここでデータをサーバーに送信する
+      // 今回はデモなので、単に結果を表示する
+      
+      // 回答をランダムに追加（デモ用）
+      updateChart('frequency-chart', answers.q1);
+      updateChart('burden-chart', answers.q2);
+      updateChart('issues-chart', answers.q3);
+      
+      // 結果画面を表示
+      document.getElementById('survey').style.display = 'none';
+      document.getElementById('results').style.display = 'block';
+    }
+    
+    // グラフを更新する関数（デモ用）
+    function updateChart(chartId, selectedIndex) {
+      const bars = document.querySelectorAll(`#${chartId} .bar`);
+      const counts = document.querySelectorAll(`#${chartId} .count`);
+      
+      // 選択されたオプションのカウントを増やす
+      const currentCount = parseInt(counts[selectedIndex].textContent);
+      counts[selectedIndex].textContent = currentCount + 1;
+      
+      // 最大値を見つける
+      let maxCount = 0;
+      counts.forEach(count => {
+        const value = parseInt(count.textContent);
+        if (value > maxCount) maxCount = value;
+      });
+      
+      // 全てのバーの高さを再計算
+      bars.forEach((bar, index) => {
+        const count = parseInt(counts[index].textContent);
+        const percentage = (count / maxCount) * 100;
+        bar.style.height = `${percentage}%`;
+      });
+    }
+    
+    // アンケート画面に戻る関数
+    function showSurvey() {
+      document.getElementById('results').style.display = 'none';
+      document.getElementById('survey').style.display = 'block';
+      
+      // 選択をリセット
+      const buttons = document.querySelectorAll('.options button');
+      buttons.forEach(btn => btn.classList.remove('selected'));
+      
+      // 回答をリセット
+      Object.keys(answers).forEach(key => {
+        answers[key] = null;
+      });
+    }
+  </script>
+</body>
+</html>
