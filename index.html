@@ -177,11 +177,10 @@
     }
     .h-bar-value {
       position: absolute;
-      right: -70px;
+      right: -40px;
       top: 2px;
-      width: 65px;
-      text-align: left;
-      white-space: nowrap;
+      width: 35px;
+      text-align: center;
     }
     .action-buttons {
       margin-top: 40px;
@@ -195,6 +194,8 @@
     .action-buttons button {
       flex: 1;
       min-width: 180px;
+      width: 30%;
+      text-align: center;
     }
     .total-responses {
       text-align: center;
@@ -522,7 +523,7 @@
           legendItem.className = 'legend-item';
           legendItem.innerHTML = `
             <div class="legend-color" style="background-color: ${options[index].color};"></div>
-            <div class="legend-text">${options[index].label}: ${value}人 (${percent}%)</div>
+            <div class="legend-text">${options[index].label}: ${value}</div>
           `;
           legendElement.appendChild(legendItem);
           
@@ -581,7 +582,7 @@
           <div class="h-bar-outer">
             <div class="h-bar" style="width: ${percent}%; background-color: ${options[index].color};"></div>
           </div>
-          <div class="h-bar-value">${value}人</div>
+          <div class="h-bar-value">${value}</div>
         `;
         
         chartElement.appendChild(barRow);
