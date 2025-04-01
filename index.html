@@ -103,17 +103,11 @@
       margin-right: 10px;
     }
     .back-btn {
-      margin-top: 20px;
       background-color: #f0f0f0;
     }
     .reset-btn {
       background-color: #ff6666;
       color: white;
-      padding: 10px 15px;
-      border-radius: 5px;
-      margin-top: 20px;
-      cursor: pointer;
-      text-align: center;
     }
     .welcome {
       text-align: center;
@@ -183,24 +177,37 @@
     }
     .h-bar-value {
       position: absolute;
-      right: -40px;
+      right: -70px;
       top: 2px;
-      width: 35px;
+      width: 65px;
       text-align: left;
+      white-space: nowrap;
     }
     .action-buttons {
       margin-top: 40px;
       padding-top: 20px;
       border-top: 1px solid #eee;
       display: flex;
-      flex-direction: column;
-      gap: 15px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .action-buttons button {
+      flex: 1;
+      min-width: 180px;
     }
     .total-selections {
       margin-top: 15px;
       text-align: right;
-      font-weight: bold;
       color: #0066cc;
+    }
+    .total-text {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .total-info {
+      font-size: 13px;
+      font-style: italic;
     }
     .total-responses {
       text-align: center;
@@ -210,6 +217,81 @@
       padding: 10px;
       background-color: #f0f8ff;
       border-radius: 5px;
+    }
+    .save-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .save-option-btn {
+      flex: 1;
+      min-width: 200px;
+      padding: 15px;
+      text-align: center;
+      border-radius: 5px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .save-option-btn svg {
+      margin-right: 10px;
+    }
+    .email-btn {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .csv-btn {
+      background-color: #ffc107;
+      color: #333;
+    }
+    .capture-btn {
+      background-color: #0066cc;
+      color: white;
+    }
+    #capture-area {
+      position: relative;
+    }
+    .capture-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      display: none;
+    }
+    .capture-preview {
+      max-width: 80%;
+      max-height: 80%;
+      border: 10px solid white;
+      border-radius: 5px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+    .capture-buttons {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+    }
+    .capture-buttons button {
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .save-capture-btn {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .cancel-capture-btn {
+      background-color: #f44336;
+      color: white;
     }
   </style>
 </head>
@@ -275,53 +357,92 @@
     
     <!-- 結果画面 -->
     <div id="results" class="results">
-      <h1>アンケート結果</h1>
-      
-      <div class="total-responses" id="total-responses">
-        総回答者数: 0人
-      </div>
-      
-      <div class="chart-container">
-        <!-- 円グラフ1 -->
-        <div class="chart">
-          <h2>定数管理の頻度</h2>
-          <div class="pie-container">
-            <div class="pie-chart" id="frequency-pie-chart"></div>
-            <div class="pie-legend" id="frequency-legend">
-              <!-- 動的に生成 -->
+      <div id="capture-area">
+        <h1>アンケート結果</h1>
+        
+        <div class="total-responses" id="total-responses">
+          総回答者数: 0人
+        </div>
+        
+        <div class="chart-container">
+          <!-- 円グラフ1 -->
+          <div class="chart">
+            <h2>定数管理の頻度</h2>
+            <div class="pie-container">
+              <div class="pie-chart" id="frequency-pie-chart"></div>
+              <div class="pie-legend" id="frequency-legend">
+                <!-- 動的に生成 -->
+              </div>
+            </div>
+          </div>
+          
+          <!-- 円グラフ2 -->
+          <div class="chart">
+            <h2>定数管理の負担感</h2>
+            <div class="pie-container">
+              <div class="pie-chart" id="burden-pie-chart"></div>
+              <div class="pie-legend" id="burden-legend">
+                <!-- 動的に生成 -->
+              </div>
             </div>
           </div>
         </div>
         
-        <!-- 円グラフ2 -->
-        <div class="chart">
-          <h2>定数管理の負担感</h2>
-          <div class="pie-container">
-            <div class="pie-chart" id="burden-pie-chart"></div>
-            <div class="pie-legend" id="burden-legend">
-              <!-- 動的に生成 -->
-            </div>
+        <!-- 横棒グラフ -->
+        <div class="horizontal-bar-chart">
+          <h2>救急カート管理の課題</h2>
+          <div class="h-bar-container" id="issues-chart">
+            <!-- 動的に生成 -->
           </div>
         </div>
       </div>
       
-      <!-- 横棒グラフ -->
-      <div class="horizontal-bar-chart">
-        <h2>救急カート管理の課題</h2>
-        <div class="h-bar-container" id="issues-chart">
-          <!-- 動的に生成 -->
-        </div>
+      <!-- 保存オプション -->
+      <h2>結果を保存</h2>
+      <div class="save-options">
+        <button class="save-option-btn email-btn" onclick="sendEmail()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 8L10.89 13.26C11.2187 13.4793 11.6049 13.5963 12 13.5963C12.3951 13.5963 12.7813 13.4793 13.11 13.26L21 8M5 19H19C19.5304 19 20.0391 18.7893 20.4142 18.4142C20.7893 18.0391 21 17.5304 21 17V7C21 6.46957 20.7893 5.96086 20.4142 5.58579C20.0391 5.21071 19.5304 5 19 5H5C4.46957 5 3.96086 5.21071 3.58579 5.58579C3.21071 5.96086 3 6.46957 3 7V17C3 17.5304 3.21071 18.0391 3.58579 18.4142C3.96086 18.7893 4.46957 19 5 19Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          メールで送信
+        </button>
+        <button class="save-option-btn csv-btn" onclick="downloadCSV()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 3V7C14 7.26522 14.1054 7.51957 14.2929 7.70711C14.4804 7.89464 14.7348 8 15 8H19M14 3H7C6.46957 3 5.96086 3.21071 5.58579 3.58579C5.21071 3.96086 5 4.46957 5 5V19C5 19.5304 5.21071 20.0391 5.58579 20.4142C5.96086 20.7893 6.46957 21 7 21H17C17.5304 21 18.0391 20.7893 18.4142 20.4142C18.7893 20.0391 19 19.5304 19 19V8M14 3L19 8M9 17H15M9 13H15M9 9H10" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          CSVで保存
+        </button>
+        <button class="save-option-btn capture-btn" onclick="captureScreen()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 9C15 10.6569 13.6569 12 12 12C10.3431 12 9 10.6569 9 9C9 7.34315 10.3431 6 12 6C13.6569 6 15 7.34315 15 9Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M20 17L17.2 13.8667C17.0423 13.6687 16.8395 13.5081 16.6073 13.3966C16.375 13.2851 16.1185 13.2247 15.8583 13.2197C15.5981 13.2148 15.3393 13.2654 15.1023 13.368C14.8654 13.4705 14.6558 13.6234 14.49 13.8147L11.49 17.5667C11.3262 17.768 11.1181 17.9294 10.8817 18.0379C10.6452 18.1464 10.3864 18.1993 10.1248 18.192C9.86312 18.1847 9.6077 18.1174 9.37817 17.9956C9.14864 17.8738 8.95123 17.7004 8.8 17.49L3 9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 21H16C17.5913 21 19.1174 20.3679 20.2426 19.2426C21.3679 18.1174 22 16.5913 22 15V9C22 7.4087 21.3679 5.88258 20.2426 4.75736C19.1174 3.63214 17.5913 3 16 3H8C6.4087 3 4.88258 3.63214 3.75736 4.75736C2.63214 5.88258 2 7.4087 2 9V15C2 16.5913 2.63214 18.1174 3.75736 19.2426C4.88258 20.3679 6.4087 21 8 21Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          画面キャプチャ
+        </button>
       </div>
       
       <!-- 操作ボタン -->
       <div class="action-buttons">
-        <button class="submit-btn" onclick="sendEmail()">結果を保存（masayo.miura@sato-global.comに送信）</button>
+        <button class="submit-btn" onclick="sendEmail()">結果を保存</button>
         <button class="reset-btn" onclick="resetResults()">すべての回答をリセット</button>
         <button class="back-btn" onclick="showWelcome()">トップに戻る</button>
       </div>
     </div>
   </div>
+  
+  <!-- キャプチャ用オーバーレイ -->
+  <div class="capture-overlay" id="capture-overlay">
+    <img class="capture-preview" id="capture-preview" />
+    <div class="capture-buttons">
+      <button class="save-capture-btn" onclick="saveCapture()">保存する</button>
+      <button class="cancel-capture-btn" onclick="cancelCapture()">キャンセル</button>
+    </div>
+  </div>
 
+  <!-- html2canvas ライブラリの読み込み -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  
   <script>
     // 保存用データ
     let surveyData = {
@@ -329,6 +450,9 @@
       q2: [0, 0, 0, 0],    // 感じる, まあまあ感じる, あまり感じない, 感じない
       q3: [0, 0, 0, 0]     // 定数確認の時間, 使用実績, 補充忘れ, 期限切れ
     };
+    
+    // 画面キャプチャ用変数
+    let captureImage = null;
     
     // ローカルストレージから読み込み
     function loadData() {
@@ -573,13 +697,14 @@
       // 最大値を取得
       const maxValue = Math.max(...data);
       
-      // 総回答数を取得
-      const totalSelections = data.reduce((a, b) => a + b, 0);
+      // 総回答者数を取得 (問1の合計)
+      const totalRespondents = surveyData.q1.reduce((a, b) => a + b, 0);
       
       // 各項目の棒グラフを作成
       sortedIndices.forEach(index => {
         const value = data[index];
         const percent = maxValue > 0 ? (value / maxValue) * 100 : 0;
+        const percentOfRespondents = totalRespondents > 0 ? Math.round((value / totalRespondents) * 100) : 0;
         
         const barRow = document.createElement('div');
         barRow.className = 'h-bar-row';
@@ -593,14 +718,6 @@
         
         chartElement.appendChild(barRow);
       });
-      
-      // 総選択数の表示
-      if (totalSelections > 0) {
-        const totalElement = document.createElement('div');
-        totalElement.className = 'total-selections';
-        totalElement.innerHTML = `<div class="total-text">総選択数: ${totalSelections}人（複数選択可）</div>`;
-        chartElement.appendChild(totalElement);
-      }
     }
     
     // メールで送信
@@ -612,33 +729,213 @@
         return;
       }
       
-      // メールの本文を作成
-      const subject = encodeURIComponent('救急カート管理アンケート結果');
+      try {
+        // メールの本文を作成
+        let bodyContent = `救急カート管理アンケート結果\n\n`;
+        bodyContent += `総回答者数: ${totalResponses}人\n\n`;
+        
+        // 問1の結果
+        bodyContent += `■ 定数管理の頻度\n`;
+        const q1Labels = ['各勤務帯', '1日に1回', '週に1回', '使用の都度', 'その他'];
+        q1Labels.forEach((label, index) => {
+          bodyContent += `${label}: ${surveyData.q1[index]}人\n`;
+        });
+        
+        bodyContent += `\n■ 定数管理の負担感\n`;
+        const q2Labels = ['感じる', 'まあまあ感じる', 'あまり感じない', '感じない'];
+        q2Labels.forEach((label, index) => {
+          bodyContent += `${label}: ${surveyData.q2[index]}人\n`;
+        });
+        
+        bodyContent += `\n■ 救急カート管理の課題\n`;
+        const q3Labels = ['定数確認の時間がかかる', '使用実績を追えないことがある', '使用後の補充忘れがある', '期限切れの管理が難しい'];
+        q3Labels.forEach((label, index) => {
+          const percentOfRespondents = totalResponses > 0 ? Math.round((surveyData.q3[index] / totalResponses) * 100) : 0;
+          bodyContent += `${label}: ${surveyData.q3[index]}人\n`;
+        });
+        
+        // URIエンコーディングを正しく適用
+        const encodedSubject = encodeURIComponent('救急カート管理アンケート結果');
+        const encodedBody = encodeURIComponent(bodyContent);
+        
+        // mailto:リンクの作成と実行
+        const mailtoLink = `mailto:masayo.miura@sato-global.com?subject=${encodedSubject}&body=${encodedBody}`;
+        
+        console.log("メール送信リンク生成:", mailtoLink);
+        
+        // メーラーを開く - ダイアログを表示して確認する
+        if (confirm('メーラーを開いて結果を送信しますか？')) {
+          // 直接リンクを開く
+          window.location.href = mailtoLink;
+          
+          // 数秒後に確認
+          setTimeout(() => {
+            const userConfirm = confirm('メーラーは正常に開きましたか？\n\n開かない場合は、ブラウザの設定でメールクライアントとの連携を許可してください。');
+            if (!userConfirm) {
+              alert('代替方法: メール内容をコピーして、手動でメールを送信することもできます。');
+              
+              // クリップボードにコピー
+              const textArea = document.createElement('textarea');
+              textArea.value = bodyContent;
+              document.body.appendChild(textArea);
+              textArea.select();
+              document.execCommand('copy');
+              document.body.removeChild(textArea);
+              
+              alert('メール内容をクリップボードにコピーしました。メーラーで新規メールを作成し、貼り付けてください。');
+            }
+          }, 2000);
+        }
+      } catch (error) {
+        console.error("メール送信エラー:", error);
+        alert('メール送信に問題が発生しました。エラー: ' + error.message);
+      }
+    }
+    
+    // CSVとしてダウンロードする関数
+    function downloadCSV() {
+      const totalResponses = surveyData.q1.reduce((a, b) => a + b, 0);
       
-      let body = encodeURIComponent(`救急カート管理アンケート結果\n\n`);
-      body += encodeURIComponent(`総回答者数: ${totalResponses}人\n\n`);
+      if (totalResponses === 0) {
+        alert('回答データがありません。');
+        return;
+      }
       
-      // 問1の結果
-      body += encodeURIComponent(`■ 定数管理の頻度\n`);
-      const q1Labels = ['各勤務帯', '1日に1回', '週に1回', '使用の都度', 'その他'];
-      q1Labels.forEach((label, index) => {
-        body += encodeURIComponent(`${label}: ${surveyData.q1[index]}人\n`);
-      });
+      try {
+        // CSVヘッダー
+        let csvContent = "データ種類,項目,回答数\n";
+        
+        // 問1のデータ
+        const q1Labels = ['各勤務帯', '1日に1回', '週に1回', '使用の都度', 'その他'];
+        q1Labels.forEach((label, index) => {
+          const value = surveyData.q1[index];
+          csvContent += `定数管理の頻度,${label},${value}\n`;
+        });
+        
+        // 問2のデータ
+        const q2Labels = ['感じる', 'まあまあ感じる', 'あまり感じない', '感じない'];
+        q2Labels.forEach((label, index) => {
+          const value = surveyData.q2[index];
+          csvContent += `定数管理の負担感,${label},${value}\n`;
+        });
+        
+        // 問3のデータ
+        const q3Labels = ['定数確認の時間がかかる', '使用実績を追えないことがある', '使用後の補充忘れがある', '期限切れの管理が難しい'];
+        q3Labels.forEach((label, index) => {
+          const value = surveyData.q3[index];
+          csvContent += `救急カート管理の課題,${label},${value}\n`;
+        });
+        
+        // 総計データ
+        csvContent += `\n総回答者数,${totalResponses}\n`;
+        
+        // BOMを追加してShift-JISでの文字化けを防ぐ
+        const BOM = new Uint8Array([0xEF, 0xBB, 0xBF]);
+        const blob = new Blob([BOM, csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        
+        // ダウンロードリンクを作成して自動クリック
+        const link = document.createElement('a');
+        const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD形式
+        link.download = `救急カート管理アンケート結果_${date}.csv`;
+        link.href = url;
+        link.style.display = 'none';
+        
+        document.body.appendChild(link);
+        link.click();
+        
+        // クリーンアップ
+        setTimeout(() => {
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        }, 100);
+        
+        return true;
+      } catch (error) {
+        console.error("CSVダウンロードエラー:", error);
+        alert('CSVダウンロードに問題が発生しました。エラー: ' + error.message);
+        return false;
+      }
+    }
+    
+    // 画面キャプチャ機能
+    function captureScreen() {
+      const captureArea = document.getElementById('capture-area');
+      const overlay = document.getElementById('capture-overlay');
+      const preview = document.getElementById('capture-preview');
       
-      body += encodeURIComponent(`\n■ 定数管理の負担感\n`);
-      const q2Labels = ['感じる', 'まあまあ感じる', 'あまり感じない', '感じない'];
-      q2Labels.forEach((label, index) => {
-        body += encodeURIComponent(`${label}: ${surveyData.q2[index]}人\n`);
-      });
+      // キャプチャ中の表示
+      const processingDiv = document.createElement('div');
+      processingDiv.style.position = 'fixed';
+      processingDiv.style.top = '50%';
+      processingDiv.style.left = '50%';
+      processingDiv.style.transform = 'translate(-50%, -50%)';
+      processingDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+      processingDiv.style.color = 'white';
+      processingDiv.style.padding = '20px';
+      processingDiv.style.borderRadius = '10px';
+      processingDiv.style.zIndex = '9999';
+      processingDiv.textContent = '画面キャプチャ処理中...';
+      document.body.appendChild(processingDiv);
       
-      body += encodeURIComponent(`\n■ 救急カート管理の課題\n`);
-      const q3Labels = ['定数確認の時間がかかる', '使用実績を追えないことがある', '使用後の補充忘れがある', '期限切れの管理が難しい'];
-      q3Labels.forEach((label, index) => {
-        body += encodeURIComponent(`${label}: ${surveyData.q3[index]}人\n`);
-      });
+      // 少し遅延させてUIの更新を反映
+      setTimeout(() => {
+        // html2canvasを使ってキャプチャ
+        html2canvas(captureArea, {
+          backgroundColor: 'white',
+          scale: 2, // 高解像度対応
+          logging: false,
+          useCORS: true
+        }).then(canvas => {
+          // キャプチャ完了
+          document.body.removeChild(processingDiv);
+          
+          // キャプチャ画像をデータURLとして保存
+          captureImage = canvas.toDataURL('image/png');
+          
+          // プレビュー表示
+          preview.src = captureImage;
+          overlay.style.display = 'flex';
+        }).catch(error => {
+          document.body.removeChild(processingDiv);
+          console.error('キャプチャエラー:', error);
+          alert('画面キャプチャに失敗しました: ' + error.message);
+        });
+      }, 100);
+    }
+    
+    // キャプチャをキャンセル
+    function cancelCapture() {
+      document.getElementById('capture-overlay').style.display = 'none';
+    }
+    
+    // キャプチャを保存
+    function saveCapture() {
+      if (!captureImage) {
+        alert('キャプチャ画像がありません。');
+        return;
+      }
       
-      // メーラーを開く
-      window.location.href = `mailto:masayo.miura@sato-global.com?subject=${subject}&body=${body}`;
+      try {
+        // ダウンロードリンクを作成
+        const link = document.createElement('a');
+        const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD形式
+        link.download = `救急カート管理アンケート_${date}.png`;
+        link.href = captureImage;
+        link.style.display = 'none';
+        
+        document.body.appendChild(link);
+        link.click();
+        
+        // クリーンアップ
+        setTimeout(() => {
+          document.body.removeChild(link);
+          document.getElementById('capture-overlay').style.display = 'none';
+        }, 100);
+      } catch (error) {
+        console.error('画像保存エラー:', error);
+        alert('画像の保存に失敗しました: ' + error.message);
+      }
     }
     
     // 全ての結果をリセットする関数
