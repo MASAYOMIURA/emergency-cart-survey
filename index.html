@@ -85,6 +85,7 @@
       height: 250px;
       border-radius: 50%;
       position: relative;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     .pie-legend {
       display: flex;
@@ -187,10 +188,19 @@
       width: 35px;
       text-align: left;
     }
-    .email-form {
-      margin-top: 30px;
+    .action-buttons {
+      margin-top: 40px;
       padding-top: 20px;
       border-top: 1px solid #eee;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .total-selections {
+      margin-top: 15px;
+      text-align: right;
+      font-weight: bold;
+      color: #0066cc;
     }
     .total-responses {
       text-align: center;
@@ -303,15 +313,12 @@
         </div>
       </div>
       
-      <!-- メール送信フォーム -->
-      <div class="email-form">
-        <h2>回答結果を送信</h2>
-        <p>メールで回答結果を送信できます。</p>
-        <button class="submit-btn" onclick="sendEmail()">結果をメールで送信</button>
+      <!-- 操作ボタン -->
+      <div class="action-buttons">
+        <button class="submit-btn" onclick="sendEmail()">結果を保存（masayo.miura@sato-global.comに送信）</button>
+        <button class="reset-btn" onclick="resetResults()">すべての回答をリセット</button>
+        <button class="back-btn" onclick="showWelcome()">トップに戻る</button>
       </div>
-      
-      <button class="reset-btn" onclick="resetResults()">すべての回答をリセット</button>
-      <button class="back-btn" onclick="showWelcome()">トップに戻る</button>
     </div>
   </div>
 
@@ -495,15 +502,26 @@
       const legendElement = document.getElementById(`${id}-legend`);
       legendElement.innerHTML = '';
       
-      let percentages = [];
-      let cumulativePercent = 0;
-      
       // データがある場合のみ処理
       if (total > 0) {
+        // 円グラフのセグメントを生成するための配列
+        let segments = [];
+        let currentPercent = 0;
+        
         data.forEach((value, index) => {
-          const percent = Math.round((value / total) * 100);
-          percentages.push(percent);
+          if (value === 0) return; // 値が0ならスキップ
           
+          const percent = Math.round((value / total) * 100);
+          const nextPercent = currentPercent + percent;
+          
+          // セグメント情報を保存
+          segments.push({
+            color: options[index].color,
+            start: currentPercent,
+            end: nextPercent
+          });
+          
+          // レジェンド項目を作成
           const legendItem = document.createElement('div');
           legendItem.className = 'legend-item';
           legendItem.innerHTML = `
@@ -511,28 +529,27 @@
             <div class="legend-text">${options[index].label}: ${value}人 (${percent}%)</div>
           `;
           legendElement.appendChild(legendItem);
+          
+          currentPercent = nextPercent;
         });
         
-        // conic-gradientを更新
+        // conic-gradientを生成
         const pieChart = document.getElementById(`${id}-pie-chart`);
-        let gradient = 'conic-gradient(';
-        
-        let currentAngle = 0;
-        data.forEach((value, index) => {
-          if (value === 0) return; // 値が0ならスキップ
+        if (segments.length > 0) {
+          let gradient = 'conic-gradient(';
           
-          const angle = (value / total) * 360;
-          const startAngle = currentAngle;
-          const endAngle = currentAngle + angle;
+          segments.forEach((segment, i) => {
+            gradient += `${segment.color} ${segment.start}% ${segment.end}%`;
+            if (i < segments.length - 1) {
+              gradient += ', ';
+            }
+          });
           
-          gradient += `${options[index].color} ${startAngle}deg ${endAngle}deg`;
-          if (index < data.length - 1) gradient += ', ';
-          
-          currentAngle = endAngle;
-        });
-        
-        gradient += ')';
-        pieChart.style.background = gradient;
+          gradient += ')';
+          pieChart.style.background = gradient;
+        } else {
+          pieChart.style.background = '#e0e0e0';
+        }
       } else {
         // データがない場合は灰色の円を表示
         document.getElementById(`${id}-pie-chart`).style.background = '#e0e0e0';
@@ -556,6 +573,9 @@
       // 最大値を取得
       const maxValue = Math.max(...data);
       
+      // 総回答数を取得
+      const totalSelections = data.reduce((a, b) => a + b, 0);
+      
       // 各項目の棒グラフを作成
       sortedIndices.forEach(index => {
         const value = data[index];
@@ -568,11 +588,19 @@
           <div class="h-bar-outer">
             <div class="h-bar" style="width: ${percent}%; background-color: ${options[index].color};"></div>
           </div>
-          <div class="h-bar-value">${value}</div>
+          <div class="h-bar-value">${value}人</div>
         `;
         
         chartElement.appendChild(barRow);
       });
+      
+      // 総選択数の表示
+      if (totalSelections > 0) {
+        const totalElement = document.createElement('div');
+        totalElement.className = 'total-selections';
+        totalElement.innerHTML = `<div class="total-text">総選択数: ${totalSelections}人（複数選択可）</div>`;
+        chartElement.appendChild(totalElement);
+      }
     }
     
     // メールで送信
