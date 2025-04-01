@@ -22,6 +22,10 @@
       color: #0066cc;
       text-align: center;
     }
+    h2 {
+      color: #000;
+      font-size: 20px;
+    }
     .question {
       margin-bottom: 25px;
       padding-bottom: 15px;
@@ -177,10 +181,12 @@
     }
     .h-bar-value {
       position: absolute;
-      right: -40px;
-      top: 2px;
-      width: 35px;
-      text-align: center;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-weight: bold;
+      color: #000;
+      text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
     }
     .action-buttons {
       margin-top: 40px;
@@ -192,10 +198,13 @@
       gap: 10px;
     }
     .action-buttons button {
-      flex: 1;
-      min-width: 180px;
-      width: 30%;
+      flex: 1 1 0;
+      min-width: 0;
+      width: 33%;
+      padding: 12px;
+      font-size: 16px;
       text-align: center;
+      white-space: nowrap;
     }
     .total-responses {
       text-align: center;
@@ -523,7 +532,7 @@
           legendItem.className = 'legend-item';
           legendItem.innerHTML = `
             <div class="legend-color" style="background-color: ${options[index].color};"></div>
-            <div class="legend-text">${options[index].label}: ${value}</div>
+            <div class="legend-text">${options[index].label}: ${value} (${percent}%)</div>
           `;
           legendElement.appendChild(legendItem);
           
@@ -581,8 +590,8 @@
           <div class="h-bar-label">${options[index].label}</div>
           <div class="h-bar-outer">
             <div class="h-bar" style="width: ${percent}%; background-color: ${options[index].color};"></div>
+            <div class="h-bar-value">${value}</div>
           </div>
-          <div class="h-bar-value">${value}</div>
         `;
         
         chartElement.appendChild(barRow);
